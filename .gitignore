@@ -1,0 +1,38 @@
+# Go
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.prof
+*.pprof
+*.cov
+*.cover
+*.log
+coverage/
+bin/
+dist/
+build/
+
+# Generated (protobuf / gateway / sqlc etc.)
+**/*.pb.go
+**/*.gw.go
+**/gen/
+**/pb/
+
+# Modules / vendoring (if ever used)
+vendor/
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docker / env
+.env
+.env.*
+.docker/
+.dockerignore
