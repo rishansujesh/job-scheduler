@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package api.v1;
+
+option go_package = "job-scheduler/internal/api/proto;proto";
+
+import "google/api/annotations.proto";
+
+// Jobs & Schedules & Runs
+
+message Job {
+  string id = 1;
+  string name = 2;
+  string type = 3;
+  string handler = 4; // "shell" | "http"
+  string args_json = 5; // raw JSON string
+  bool enabled = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message CreateJobRequest {
+  string name = 1;
+  string type = 2;
+  string handler = 3;
+  string args_json = 4; // JSON
+  bool enabled = 5;
+}
+message CreateJobResponse { Job job = 1; }
+
+message ListJobsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+message ListJobsResponse { repeated Job jobs = 1; }
+
+message UpdateJobRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string args_json = 3;
+  optional bool enabled = 4;
+}
+message UpdateJobResponse { Job job = 1; }
+
+message DeleteJobRequest { string id = 1; }
+message DeleteJobResponse {}
+
+message RunJobRequest {
+  string id = 1;        // job id
+  string args_json = 2; // optional override args for this run
+}
+message RunJobResponse { string run_id = 1; }
+
+message Schedule {
+  string id = 1;
+  string job_id = 2;
+  optional string cron_expr = 3;
+  optional int32 fixed_interval_seconds = 4;
+  string next_run_at = 5;
+  string timezone = 6;
+  optional string last_enqueued_at = 7;
+  bool enabled = 8;
+}
+
+message CreateScheduleRequest {
+  string job_id = 1;
+  optional string cron_expr = 2;
+  optional int32 fixed_interval_seconds = 3;
+  string next_run_at = 4; // RFC3339
+  string timezone = 5;    // e.g., "UTC"
+  bool enabled = 6;
+}
+message CreateScheduleResponse { Schedule schedule = 1; }
+
+message ListSchedulesRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+message ListSchedulesResponse { repeated Schedule schedules = 1; }
+
+message UpdateScheduleRequest {
+  string id = 1;
+  optional string cron_expr = 2;
+  optional int32 fixed_interval_seconds = 3;
+  optional string next_run_at = 4;
+  optional string timezone = 5;
+  optional bool enabled = 6;
+}
+message UpdateScheduleResponse { Schedule schedule = 1; }
+
+message DeleteScheduleRequest { string id = 1; }
+message DeleteScheduleResponse {}
+
+message JobRun {
+  int64 id = 1;
+  string job_id = 2;
+  string run_id = 3;
+  string started_at = 4;
+  optional string finished_at = 5;
+  string status = 6;
+  int32 attempts = 7;
+  optional string error_text = 8;
+  optional string worker_id = 9;
+  string idempotency_key = 10;
+}
+
+message ListJobRunsRequest {
+  string job_id = 1;
+  int32 limit = 2;
+}
+message ListJobRunsResponse {
+  repeated JobRun runs = 1;
+}
+
+service JobService {
+  rpc CreateJob(CreateJobRequest) returns (CreateJobResponse) {
+    option (google.api.http) = { post: "/v1/jobs" body: "*" };
+  }
+  rpc ListJobs(ListJobsRequest) returns (ListJobsResponse) {
+    option (google.api.http) = { get: "/v1/jobs" };
+  }
+  rpc UpdateJob(UpdateJobRequest) returns (UpdateJobResponse) {
+    option (google.api.http) = { patch: "/v1/jobs/{id}" body: "*" };
+  }
+  rpc DeleteJob(DeleteJobRequest) returns (DeleteJobResponse) {
+    option (google.api.http) = { delete: "/v1/jobs/{id}" };
+  }
+
+  rpc RunJob(RunJobRequest) returns (RunJobResponse) {
+    option (google.api.http) = { post: "/v1/jobs/{id}:run" body: "*" };
+  }
+
+  rpc CreateSchedule(CreateScheduleRequest) returns (CreateScheduleResponse) {
+    option (google.api.http) = { post: "/v1/schedules" body: "*" };
+  }
+  rpc ListSchedules(ListSchedulesRequest) returns (ListSchedulesResponse) {
+    option (google.api.http) = { get: "/v1/schedules" };
+  }
+  rpc UpdateSchedule(UpdateScheduleRequest) returns (UpdateScheduleResponse) {
+    option (google.api.http) = { patch: "/v1/schedules/{id}" body: "*" };
+  }
+  rpc DeleteSchedule(DeleteScheduleRequest) returns (DeleteScheduleResponse) {
+    option (google.api.http) = { delete: "/v1/schedules/{id}" };
+  }
+
+  rpc ListJobRuns(ListJobRunsRequest) returns (ListJobRunsResponse) {
+    option (google.api.http) = { get: "/v1/jobs/{job_id}/runs" };
+  }
+}

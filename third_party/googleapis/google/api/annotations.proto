@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package google.api;
+
+option go_package = "google.golang.org/genproto/googleapis/api/annotations;annotations";
+
+import "google/api/http.proto";
+import "google/protobuf/descriptor.proto";
+
+// See: https://github.com/googleapis/googleapis/blob/master/google/api/annotations.proto
+
+extend google.protobuf.MethodOptions {
+  // Maps an RPC to one or more HTTP REST endpoints.
+  HttpRule http = 72295728;
+}
