@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"job-scheduler/internal/api/proto"
-	"job-scheduler/internal/jobs"
-	redisx "job-scheduler/internal/redis"
+	"github.com/rishansujesh/job-scheduler/internal/api/proto"
+	"github.com/rishansujesh/job-scheduler/internal/jobs"
+	redisx "github.com/rishansujesh/job-scheduler/internal/redis"
 )
 
 type Server struct {

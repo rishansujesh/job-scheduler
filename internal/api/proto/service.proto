@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.v1;
 
-option go_package = "job-scheduler/internal/api/proto;proto";
+option go_package = "github.com/rishansujesh/job-scheduler/internal/api/proto;proto";
 
 import "google/api/annotations.proto";
 

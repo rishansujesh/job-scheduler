@@ -15,8 +15,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"job-scheduler/internal/api/proto"
-	redisx "job-scheduler/internal/redis"
+	"github.com/rishansujesh/job-scheduler/internal/api/proto"
+	redisx "github.com/rishansujesh/job-scheduler/internal/redis"
 )
 
 // StartServers starts gRPC on grpcAddr and REST gateway on httpAddr.

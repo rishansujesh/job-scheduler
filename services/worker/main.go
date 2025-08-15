@@ -10,9 +10,9 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	"job-scheduler/internal/jobs"
-	redisx "job-scheduler/internal/redis"
-	"job-scheduler/internal/worker"
+	"github.com/rishansujesh/job-scheduler/internal/jobs"
+	redisx "github.com/rishansujesh/job-scheduler/internal/redis"
+	"github.com/rishansujesh/job-scheduler/internal/worker"
 )
 
 func main() {

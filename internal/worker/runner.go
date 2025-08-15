@@ -10,9 +10,9 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"job-scheduler/internal/jobs"
-	redisx "job-scheduler/internal/redis"
-	"job-scheduler/internal/worker/handlers"
+	"github.com/rishansujesh/job-scheduler/internal/jobs"
+	redisx "github.com/rishansujesh/job-scheduler/internal/redis"
+	"github.com/rishansujesh/job-scheduler/internal/worker/handlers"
 )
 
 type Runner struct {

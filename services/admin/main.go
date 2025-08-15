@@ -13,7 +13,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	redisx "job-scheduler/internal/redis"
+	redisx "github.com/rishansujesh/job-scheduler/internal/redis"
 )
 
 type CmdFunc func(ctx context.Context, rdb *redis.Client, sc redisx.StreamsConfig, group, consumer string, args []string) error

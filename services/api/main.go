@@ -8,8 +8,8 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	"job-scheduler/internal/api/server"
-	redisx "job-scheduler/internal/redis"
+	"github.com/rishansujesh/job-scheduler/internal/api/server"
+	redisx "github.com/rishansujesh/job-scheduler/internal/redis"
 )
 
 func main() {
