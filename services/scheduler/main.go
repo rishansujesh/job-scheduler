@@ -11,8 +11,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/google/uuid"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/redis/go-redis/v9"
 
 	"job-scheduler/internal/jobs"
@@ -148,7 +148,7 @@ LIMIT 200;`, now)
 		if err := rows.Scan(&sc.ID, &sc.JobID, &sc.CronExpr, &sc.FixedIntervalSeconds, &sc.NextRunAt, &sc.Timezone, &sc.LastEnqueuedAt, &sc.Enabled); err != nil {
 			return err
 		}
-		locked, err := schedule.WithScheduleTxLock(ctx, s.DB, sc.ID, func(tx *sql.Tx) error {
+		_, err := schedule.WithScheduleTxLock(ctx, s.DB, sc.ID, func(tx *sql.Tx) error {
 			// still due?
 			var stillDue bool
 			if err := tx.QueryRowContext(ctx, `
@@ -216,9 +216,6 @@ UPDATE schedules SET next_run_at=$1, last_enqueued_at=$2 WHERE id=$3
 		})
 		if err != nil {
 			return err
-		}
-		if !locked {
-			continue
 		}
 	}
 	return rows.Err()

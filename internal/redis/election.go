@@ -10,12 +10,12 @@ import (
 )
 
 type LeaderElector struct {
-	rdb       *redis.Client
-	key       string
-	ttl       time.Duration
-	instance  string
-	isLeader  atomic.Bool
-	cancel    context.CancelFunc
+	rdb      *redis.Client
+	key      string
+	ttl      time.Duration
+	instance string
+	isLeader atomic.Bool
+	cancel   context.CancelFunc
 }
 
 func NewLeaderElector(rdb *redis.Client, key string, ttlSec int, instanceID string) *LeaderElector {
@@ -71,7 +71,11 @@ func (l *LeaderElector) Start(ctx context.Context) {
 	}()
 }
 
-func (l *LeaderElector) Stop() { if l.cancel != nil { l.cancel() } }
+func (l *LeaderElector) Stop() {
+	if l.cancel != nil {
+		l.cancel()
+	}
+}
 
 func (l *LeaderElector) IsLeader() bool { return l.isLeader.Load() }
 

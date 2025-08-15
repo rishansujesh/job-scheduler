@@ -13,8 +13,8 @@ type ShellArgs struct {
 }
 
 type Result struct {
-	Stdout   string
-	Stderr   string
+	Stdout    string
+	Stderr    string
 	Retryable bool
 }
 

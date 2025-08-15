@@ -62,7 +62,7 @@ func RunHTTP(ctx context.Context, a HTTPArgs) (Result, error) {
 
 	respBody, _ := io.ReadAll(resp.Body)
 	res := Result{
-		Stdout:   string(respBody),
+		Stdout:    string(respBody),
 		Retryable: false,
 	}
 

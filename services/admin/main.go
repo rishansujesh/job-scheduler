@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -119,7 +118,9 @@ func cmdPending(ctx context.Context, rdb *redis.Client, sc redisx.StreamsConfig,
 	fs := flag.NewFlagSet("pending", flag.ContinueOnError)
 	stream := fs.String("stream", sc.Scheduled, "stream to inspect")
 	limit := fs.Int("count", 50, "max items to list")
-	if err := fs.Parse(args); err != nil { return err }
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
 
 	// Summary
 	summary, err := rdb.XPending(ctx, *stream, group).Result()
@@ -146,7 +147,9 @@ func cmdClaimStuck(ctx context.Context, rdb *redis.Client, sc redisx.StreamsConf
 	stream := fs.String("stream", sc.Scheduled, "stream name")
 	idle := fs.Int("idle-ms", 60000, "min idle ms")
 	count := fs.Int("count", 100, "max to claim")
-	if err := fs.Parse(args); err != nil { return err }
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
 
 	// Fetch pending candidates
 	pends, err := rdb.XPendingExt(ctx, &redis.XPendingExtArgs{
@@ -185,7 +188,9 @@ func cmdRequeueDLQ(ctx context.Context, rdb *redis.Client, sc redisx.StreamsConf
 	fs := flag.NewFlagSet("requeue-dlq", flag.ContinueOnError)
 	to := fs.String("to-stream", sc.Adhoc, "target stream to requeue into")
 	count := fs.Int("count", 50, "max items to requeue")
-	if err := fs.Parse(args); err != nil { return err }
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
 
 	// Read oldest N from DLQ
 	res, err := rdb.XRangeN(ctx, sc.DLQ, "-", "+", int64(*count)).Result()
@@ -200,7 +205,9 @@ func cmdRequeueDLQ(ctx context.Context, rdb *redis.Client, sc redisx.StreamsConf
 	for _, m := range res {
 		// Expect a "data" JSON value (what we put via XAddJSON)
 		raw, _ := getString(m.Values["data"])
-		if raw == "" { continue }
+		if raw == "" {
+			continue
+		}
 		var payload map[string]any
 		if err := json.Unmarshal([]byte(raw), &payload); err != nil {
 			continue
@@ -244,12 +251,4 @@ func hostname() string {
 		return "admin"
 	}
 	return h
-}
-
-func atoi(s string, def int) int {
-	n, err := strconv.Atoi(s)
-	if err != nil {
-		return def
-	}
-	return n
 }

@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

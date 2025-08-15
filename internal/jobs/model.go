@@ -5,14 +5,14 @@ import (
 )
 
 type Job struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Type      string                 `json:"type"`
-	Handler   string                 `json:"handler"` // "shell" | "http"
-	Args      map[string]any         `json:"args"`
-	Enabled   bool                   `json:"enabled"`
-	CreatedAt time.Time              `json:"created_at"`
-	UpdatedAt time.Time              `json:"updated_at"`
+	ID        string         `json:"id"`
+	Name      string         `json:"name"`
+	Type      string         `json:"type"`
+	Handler   string         `json:"handler"` // "shell" | "http"
+	Args      map[string]any `json:"args"`
+	Enabled   bool           `json:"enabled"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 }
 
 type Schedule struct {
@@ -38,14 +38,14 @@ const (
 )
 
 type JobRun struct {
-	ID             int64         `json:"id"`
-	JobID          string        `json:"job_id"`
-	RunID          string        `json:"run_id"` // uuid
-	StartedAt      time.Time     `json:"started_at"`
-	FinishedAt     *time.Time    `json:"finished_at,omitempty"`
-	Status         JobRunStatus  `json:"status"`
-	Attempts       int           `json:"attempts"`
-	ErrorText      *string       `json:"error_text,omitempty"`
-	WorkerID       *string       `json:"worker_id,omitempty"`
-	IdempotencyKey string        `json:"idempotency_key"`
+	ID             int64        `json:"id"`
+	JobID          string       `json:"job_id"`
+	RunID          string       `json:"run_id"` // uuid
+	StartedAt      time.Time    `json:"started_at"`
+	FinishedAt     *time.Time   `json:"finished_at,omitempty"`
+	Status         JobRunStatus `json:"status"`
+	Attempts       int          `json:"attempts"`
+	ErrorText      *string      `json:"error_text,omitempty"`
+	WorkerID       *string      `json:"worker_id,omitempty"`
+	IdempotencyKey string       `json:"idempotency_key"`
 }

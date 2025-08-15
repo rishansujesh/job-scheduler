@@ -16,14 +16,14 @@ import (
 )
 
 type Runner struct {
-	DB            *sql.DB
-	Store         *jobs.Store
-	RDB           *redis.Client
-	Streams       redisx.StreamsConfig
-	Group         string
-	ConsumerName  string
-	MaxAttempts   int
-	Logger        *log.Logger
+	DB           *sql.DB
+	Store        *jobs.Store
+	RDB          *redis.Client
+	Streams      redisx.StreamsConfig
+	Group        string
+	ConsumerName string
+	MaxAttempts  int
+	Logger       *log.Logger
 }
 
 func (r *Runner) Start(ctx context.Context) {
@@ -118,7 +118,6 @@ func (r *Runner) processMessage(ctx context.Context, stream string, m redisx.Dec
 
 	// Execute handler
 	var execErr error
-	var retryable bool
 	switch handlerName {
 	case "shell":
 		var a handlers.ShellArgs
@@ -129,8 +128,7 @@ func (r *Runner) processMessage(ctx context.Context, stream string, m redisx.Dec
 		var a handlers.HTTPArgs
 		bytesArg, _ := json.Marshal(m.Payload["args"])
 		_ = json.Unmarshal(bytesArg, &a)
-		res, err := handlers.RunHTTP(ctx, a)
-		retryable = res.Retryable
+		_, err := handlers.RunHTTP(ctx, a)
 		execErr = err
 	default:
 		execErr = fmt.Errorf("unknown handler: %s", handlerName)
@@ -150,7 +148,9 @@ func (r *Runner) processMessage(ctx context.Context, stream string, m redisx.Dec
 
 	// Failure path
 	attempt := 0
-	if a, ok := toInt(m.Payload["attempt"]); ok { attempt = a }
+	if a, ok := toInt(m.Payload["attempt"]); ok {
+		attempt = a
+	}
 	attempt++
 
 	if attempt >= r.MaxAttempts {
@@ -174,9 +174,6 @@ func (r *Runner) processMessage(ctx context.Context, stream string, m redisx.Dec
 
 	// Retry — exponential backoff (base 1s, cap 30s)
 	backoff := time.Duration(1<<min(attempt-1, 5)) * time.Second
-	if retryable {
-		// leave as computed; otherwise still retry by default
-	}
 	nextAvail := time.Now().Add(backoff).UnixMilli()
 	_ = addJSON(ctx, r.RDB, r.Streams.Retry, with(m.Payload, map[string]any{
 		"attempt":         attempt,
@@ -187,10 +184,10 @@ func (r *Runner) processMessage(ctx context.Context, stream string, m redisx.Dec
 	// Update DB to retried
 	errText := execErr.Error()
 	_, _ = r.Store.UpdateRunStatus(ctx, jobs.UpdateRunStatusParams{
-		RunID:    runID,
-		Status:   jobs.StatusRetried,
+		RunID:     runID,
+		Status:    jobs.StatusRetried,
 		ErrorText: &errText,
-		Attempts: &attempt,
+		Attempts:  &attempt,
 	})
 	_, _ = redisx.Ack(ctx, r.RDB, stream, r.Group, m.ID)
 	return nil
@@ -204,13 +201,21 @@ func addJSON(ctx context.Context, rdb *redis.Client, stream string, payload map[
 }
 func with(m map[string]any, extra map[string]any) map[string]any {
 	out := map[string]any{}
-	for k, v := range m { out[k] = v }
-	for k, v := range extra { out[k] = v }
+	for k, v := range m {
+		out[k] = v
+	}
+	for k, v := range extra {
+		out[k] = v
+	}
 	return out
 }
 func str(v any) (string, bool) {
-	if v == nil { return "", false }
-	if s, ok := v.(string); ok { return s, true }
+	if v == nil {
+		return "", false
+	}
+	if s, ok := v.(string); ok {
+		return s, true
+	}
 	return "", false
 }
 func toInt(v any) (int, bool) {
@@ -223,5 +228,10 @@ func toInt(v any) (int, bool) {
 		return 0, false
 	}
 }
-func min(a, b int) int { if a<b { return a }; return b }
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
 func timePtr(t time.Time) *time.Time { return &t }
