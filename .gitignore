@@ -16,8 +16,8 @@ dist/
 build/
 
 # Generated (protobuf / gateway / sqlc etc.)
-**/*.pb.go
-**/*.gw.go
+#**/*.pb.go
+#**/*.gw.go
 **/gen/
 **/pb/
 
