@@ -13,7 +13,7 @@
 coverage/
 bin/
 dist/
-build/
+# build/ (kept in repo for Dockerfiles)
 
 # Generated (protobuf / gateway / sqlc etc.)
 #**/*.pb.go
