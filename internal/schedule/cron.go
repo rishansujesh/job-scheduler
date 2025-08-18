@@ -12,9 +12,11 @@ import (
 func NextRun(cronExpr *string, fixedIntervalSeconds *int, from time.Time, timezone string) (time.Time, error) {
 	loc := time.UTC
 	if timezone != "" {
-		if l, err := time.LoadLocation(timezone); err == nil {
-			loc = l
+		l, err := time.LoadLocation(timezone)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("invalid timezone: %w", err)
 		}
+		loc = l
 	}
 	ref := from.In(loc)
 
