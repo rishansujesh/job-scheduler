@@ -28,3 +28,11 @@ func TestNextRun_Cron(t *testing.T) {
 		t.Fatalf("want %v got %v", want, nxt)
 	}
 }
+
+func TestNextRun_InvalidTimezone(t *testing.T) {
+	cron := "* * * * *"
+	from := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
+	if _, err := NextRun(&cron, nil, from, "Not/ATimezone"); err == nil {
+		t.Fatalf("expected error for invalid timezone")
+	}
+}
