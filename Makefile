@@ -1,30 +1,40 @@
-SHELL := /bin/bash
+SHELL := /bin/bash -eu -o pipefail
 
-.PHONY: build test lint docker-up docker-down migrate e2e
+.PHONY: up down build seed verify runs demo logs admin-lag admin-pending admin-requeue smoke
+
+up:
+\tdocker compose up -d --build
+
+down:
+\tdocker compose down -v
 
 build:
-	go build ./...
+\tdocker compose build
 
-test:
-	go test -race ./...
+seed:
+\tbash scripts/seed.sh
 
-lint:
-	@if ! command -v golangci-lint >/dev/null 2>&1; then \
-		echo "golangci-lint not found. Install with:"; \
-		echo "  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.59.1/install.sh | sh -s -- -b $(HOME)/bin v1.59.1"; \
-		exit 1; \
-	fi
-	golangci-lint run ./...
+verify:
+\tbash scripts/verify_step11.sh
 
-docker-up:
-	docker compose up -d --build
+runs:
+\tbash scripts/list_all_runs.sh
 
-docker-down:
-	docker compose down -v
+demo: up seed verify runs
 
-migrate:
-	go run internal/db/migrate.go
+logs:
+\tdocker compose logs -f --since=2m api scheduler worker
 
-e2e:
-	@echo "Ensure stack is running: docker compose up -d"
-	E2E=1 go test -v ./integration/...
+admin-lag:
+\tdocker compose run --rm admin lag
+
+admin-pending:
+\tdocker compose run --rm admin pending --stream jobs:retry || true; \\
+\tdocker compose run --rm admin pending --stream jobs:scheduled || true; \\
+\tdocker compose run --rm admin pending --stream jobs:adhoc || true
+
+admin-requeue:
+\tdocker compose run --rm admin requeue-dlq --count 10
+
+smoke:
+\tbash scripts/smoke.sh
